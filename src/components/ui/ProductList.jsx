@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 // This path should now work if fakeApiService.js is in src/services/
-import { getProducts } from '../../services/fakeApiService';
+import { getProducts } from '../../services/fakeApiServices';
 import CategoryFilter from './CategoryFilter';
 
 // ... rest of ProductList.jsx

@@ -1,30 +1,48 @@
+// src/components/ui/HeroSection.jsx
 import React, { useState, useEffect } from 'react';
-import { getHeroData, getFeatures } from '../../services/fakeApiService';
+import { getHeroData, getFeatures } from '../../services/fakeApiServices'; // Ensure this path is correct after renaming the service file
 import { motion, AnimatePresence } from 'framer-motion';
-// ... rest of HeroSection.jsx
+
 const HeroSection = () => {
     const [data, setData] = useState(null);
     const [features, setFeatures] = useState([]);
-    const [currentSlide, setCurrentSlide] = useState(0); // 0 for Living Room, 1 for Bed Room
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [direction, setDirection] = useState(0); // MOVED THIS HOOK TO THE TOP
 
     useEffect(() => {
         getHeroData().then(setData);
         getFeatures().then(setFeatures);
     }, []);
 
-    if (!data) return <div className="h-[600px] flex items-center justify-center">Loading Hero...</div>;
+    // Early return for loading state is fine AFTER all hooks have been called
+    if (!data) {
+        return <div className="h-[600px] flex items-center justify-center">Loading Hero...</div>;
+    }
 
     const slides = [
-        { ...data.livingRoom, id: 'living' },
-        { ...data.bedRoom, id: 'bed' }
+        // Ensure data.livingRoom and data.bedRoom exist before spreading
+        ...(data.livingRoom ? [{ ...data.livingRoom, id: 'living' }] : []),
+        ...(data.bedRoom ? [{ ...data.bedRoom, id: 'bed' }] : [])
     ];
 
-    const handleNext = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-    const handlePrev = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    // It's safer to define these functions only if 'data' is available,
+    // or ensure they handle cases where 'slides' might be empty initially if data structure isn't guaranteed.
+    // However, for the hook order rule, their definition placement here is okay
+    // as long as they don't call hooks themselves.
+
+    const paginate = (newDirection) => {
+        setDirection(newDirection);
+        setCurrentSlide(prev => (prev + newDirection + slides.length) % slides.length);
+    };
+
+    // The handleNext and handlePrev functions are not used in your provided JSX,
+    // but if they were, their definition here is fine.
+    // const handleNext = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+    // const handlePrev = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
     const slideVariants = {
-        enter: (direction) => ({
-            x: direction > 0 ? 1000 : -1000,
+        enter: (directionValue) => ({ // Renamed 'direction' parameter to avoid conflict with state variable
+            x: directionValue > 0 ? 1000 : -1000,
             opacity: 0
         }),
         center: {
@@ -32,20 +50,12 @@ const HeroSection = () => {
             x: 0,
             opacity: 1
         },
-        exit: (direction) => ({
+        exit: (directionValue) => ({ // Renamed 'direction' parameter
             zIndex: 0,
-            x: direction < 0 ? 1000 : -1000,
+            x: directionValue < 0 ? 1000 : -1000,
             opacity: 0
         })
     };
-
-    const [direction, setDirection] = useState(0);
-
-    const paginate = (newDirection) => {
-        setDirection(newDirection);
-        setCurrentSlide(prev => (prev + newDirection + slides.length) % slides.length);
-    };
-
 
     return (
         <section className="bg-gradient-to-r from-slate-100 to-sky-50 pt-8 pb-12">
@@ -93,26 +103,30 @@ const HeroSection = () => {
                         transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                     >
                         <AnimatePresence initial={false} custom={direction}>
-                            <motion.img
-                                key={currentSlide}
-                                src={slides[currentSlide].image}
-                                alt={slides[currentSlide].name}
-                                custom={direction}
-                                variants={slideVariants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{
-                                    x: { type: "spring", stiffness: 300, damping: 30 },
-                                    opacity: { duration: 0.2 }
-                                }}
-                                className="absolute w-full h-full object-cover"
-                            />
+                            {slides.length > 0 && currentSlide < slides.length && ( // Add check for slides array
+                                <motion.img
+                                    key={currentSlide}
+                                    src={slides[currentSlide].image}
+                                    alt={slides[currentSlide].name}
+                                    custom={direction}
+                                    variants={slideVariants}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{
+                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                        opacity: { duration: 0.2 }
+                                    }}
+                                    className="absolute w-full h-full object-cover"
+                                />
+                            )}
                         </AnimatePresence>
-                        <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white p-3 rounded">
-                            <h3 className="font-semibold text-lg">{slides[currentSlide].name}</h3>
-                            <p className="text-sm">{slides[currentSlide].items}</p>
-                        </div>
+                        {slides.length > 0 && currentSlide < slides.length && ( // Add check for slides array
+                            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white p-3 rounded">
+                                <h3 className="font-semibold text-lg">{slides[currentSlide].name}</h3>
+                                <p className="text-sm">{slides[currentSlide].items}</p>
+                            </div>
+                        )}
                         <button onClick={() => paginate(-1)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 p-2 rounded-full hover:bg-white transition">❮</button>
                         <button onClick={() => paginate(1)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 p-2 rounded-full hover:bg-white transition">❯</button>
                     </motion.div>

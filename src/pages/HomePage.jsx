@@ -1,10 +1,10 @@
 // src/pages/HomePage.jsx
 import React from 'react';
-import Header from '../components/layout/Header';
+import Header from '../components/layout/Header'; // This line is correct
 import HeroSection from '../components/ui/HeroSection';
 import ProductList from '../components/ui/ProductList';
-// import FlashSaleSection from '../components/ui/FlashSaleSection'; // Create this similar to ProductList
-import Footer from '../components/layout/Footer'; // Create a simple footer
+// import FlashSaleSection from '../components/ui/FlashSaleSection';
+import Footer from '../components/layout/Footer';
 
 const HomePage = () => {
     return (

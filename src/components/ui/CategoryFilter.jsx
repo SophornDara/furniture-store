@@ -1,6 +1,6 @@
 // src/components/ui/CategoryFilter.jsx
 import React, { useState, useEffect } from 'react';
-import { getCategories } from '../../services/fakeApiService';
+import { getCategories } from '../../services/fakeApiServices';
 
 const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
     const [categories, setCategories] = useState([]);
