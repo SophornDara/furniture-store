@@ -1,4 +1,4 @@
-/* src/styles/main.css */
+/* src/styles/main.css */ /* The comment says main.css but the file is index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,7 +8,7 @@ body {
   font-family: 'Inter', sans-serif; /* Example font */
   @apply antialiased text-gray-800;
 }
-
+/* ... other styles ... */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
